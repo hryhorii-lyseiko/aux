@@ -1,0 +1,18 @@
+#Create table before export
+mysql -u root -p 
+(enter your mysql password(usually:root))
+create database test;
+use test;
+create table weather ( stateId VARCHAR(100), date DATE, tmin Varchar(10), tmax VARCHAR(10), snow VARCHAR(10), snwd VARCHAR(10), prcp VARCHAR(10));
+exit;
+#Export data to created table useing sqoop from folder on hdfs
+sqoop export --connect jdbc:mysql://localhost/test --table weather -m 1 --export-dir /user/root/sqooptables
+#Count amount of rows and select first 10 rows from our table on mysql
+mysql -u root -p 
+(enter your mysql password(usually:root))
+SELECT count(*) FROM weather;
+    
+SELECT * FROM weather ORDER BY stationId, date LIMIT 10;
+
+
+
