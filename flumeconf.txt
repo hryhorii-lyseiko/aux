@@ -1,0 +1,33 @@
+# Define a source, a channel, and a sink
+agent.sources = src1
+agent.channels = chan1
+agent.sinks = sink1
+
+# Set the source type to Spooling Directory and set the directory
+# location to /home/flume/ingestion/
+
+agent.sources.src1.type = exec
+agent.sources.src1.command = cat linux_messages_3000lines.txt | while read line ; do echo "$line" ; sleep 0.2 ; done > /root/output.txt
+agent.sources.src1.basenameHeader = true
+
+# Configure the channel as simple in-memory queue
+agent.channels.chan1.type = memory
+agent.channels.chan1.capacity = 100000000
+agent.channels.chan1.transactionCapacity = 10
+
+# Define the HDFS sink and set its path to your target HDFS directory
+agent.sinks.sink1.type = hdfs
+agent.sinks.sink1.hdfs.path = hdfs://sandbox.hortonworks.com:8020/user/root/flume/
+agent.sinks.sink1.hdfs.fileType = DataStream
+
+# Disable rollover functionallity as we want to keep the original files
+agent.sinks.sink1.rollCount = 0
+agent.sinks.sink1.rollInterval = 1
+agent.sinks.sink1.rollSize = 0
+agent.sinks.sink1.idleTimeout = 0
+
+# Set the files to their original name
+agent.sinks.sink1.hdfs.filePrefix = %{basename}
+
+# Connect source and sink
+agent.sources.src1.channels = chan1
